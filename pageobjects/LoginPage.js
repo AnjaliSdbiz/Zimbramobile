@@ -1,3 +1,4 @@
+const waitUtil = require('../utils/waitUtil')
 class LoginPage {
     constructor() {
         this.platform = driver.capabilities.platformName.toLowerCase();
@@ -8,7 +9,7 @@ class LoginPage {
         if (this.platform === 'android') {
             return $('android=new UiSelector().className("android.widget.EditText").instance(0)');
         } else {
-            return $('~username'); // iOS server field
+            return $('~username');
         }
     }
 
@@ -69,24 +70,23 @@ class LoginPage {
     }
 
     async login(username, password) {
-        await this.usernameInput.waitForDisplayed({ timeout: 15000 });
+        await waitUtil.waitForDisplayed(this.usernameInput, 15000)
         await this.usernameInput.click();
-        await driver.pause(500);
+        await this.usernameInput.clearValue();
         await this.usernameInput.addValue(username);
         await this.passwordInput.click();
         await this.passwordInput.addValue(password);
         await driver.hideKeyboard();
         await driver.pause(1000);
         await this.loginButton.scrollIntoView();
-        await this.loginButton.waitForDisplayed({ timeout: 5000 });
+        await waitUtil.waitForClickable(this.loginButton, 10000)
         await this.loginButton.click();
         await driver.pressKeyCode(66);
-        await driver.pause(1000);
     }
 
 
     async verifyInboxOfAccount(username) {
-        await this.inboxHeader.waitForDisplayed({ timeout: 20000 })
+        await waitUtil.waitForDisplayed(this.inboxHeader, 20000)
         await browser.waitUntil(
             async () => await this.accountLabel(username).isDisplayed(),
             {

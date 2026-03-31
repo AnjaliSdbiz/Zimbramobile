@@ -1,4 +1,7 @@
+const MobileActions = require('../utils/MobileActions')
+const WaitUtil = require('../utils/waitUtil')
 class ComposePage {
+
     constructor() {
         this.platform = driver.capabilities.platformName.toLowerCase();
     }
@@ -73,13 +76,13 @@ class ComposePage {
     async composeEmail(recipient, subject, body) {
         await this.composeButton.click();
         await this.toField.click();
-        await this.inputField.waitForDisplayed({ timeout: 15000 });
+        await WaitUtil.waitForDisplayed(this.inputField)
         await this.inputField.click();
         await driver.keys(recipient);
 
         // Step 2: Select autosuggestion
         const suggestion = await $(`android=new UiSelector().textContains("${recipient}")`);
-        await suggestion.waitForDisplayed({ timeout: 5000 });
+        await WaitUtil.waitForDisplayed(suggestion)
         await suggestion.click();
 
         // Step 3: Dismiss any leftover overlay/chip container
@@ -87,38 +90,28 @@ class ComposePage {
 
         // Step 4: Click and fill Subject
 
-        await this.subjectField.waitForDisplayed({ timeout: 15000 });
+        await WaitUtil.waitForDisplayed(this.subjectField);
         await this.subjectField.click();
         await this.subjectField.setValue(subject);
 
         // Step 5: Click and fill Body
-        await this.bodyField.waitForDisplayed({ timeout: 15000 });
+
+        await WaitUtil.waitForDisplayed(this.bodyField);
         await this.bodyField.click();
         await this.bodyField.setValue(body);
-        await browser.pause(500); 
-        await this.sendButton.click();
+
+        await WaitUtil.waitForAndClick(this.sendButton)
     }
 
-    async isEmailReceived(subject) {
-                return sentEmailBySubject.isDisplayed();
-    }
+
     async goToSent() {
-        await this.hamburgerMenu.waitForDisplayed({ timeout: 10000 });
-        await this.hamburgerMenu.click();
-        await driver.pause(1500);
-
-        await driver.executeScript('mobile: clickGesture', [{
-            x: 426,
-            y: 861
-        }]);
-
+        await WaitUtil.waitForAndClick(this.hamburgerMenu);
+        await MobileActions.tapByCoordinates(426, 861)
 
     }
-
-
 
     async verifyEmailInSent(subject) {
-        const email = await this.sentEmailBySubject(subject); 
+        const email = await this.sentEmailBySubject(subject);
         await email.waitForDisplayed({ timeout: 20000 });
         return email.isDisplayed();
     }
@@ -129,11 +122,7 @@ class ComposePage {
         const isDisplayed = await recipient.isDisplayed();
         return isDisplayed;
     }
-    async openSentEmailBySubject(subject) {
-        const email = await this.sentEmailBySubject(subject);
-        await email.waitForDisplayed({ timeout: 20000 });
-        await email.click();
-    }
+
 }
 
 module.exports = new ComposePage();
