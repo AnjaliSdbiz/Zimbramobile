@@ -1,4 +1,5 @@
 const waitUtil = require('../utils/waitUtil')
+
 class LoginPage {
     constructor() {
         this.platform = driver.capabilities.platformName.toLowerCase();
@@ -47,7 +48,7 @@ class LoginPage {
 
     get inbox() {
         if (this.platform === 'android') {
-            return $('android=new UiSelector().text("Inbox1")');
+            return $('android=new UiSelector().textContains("Inbox")');
         } else {
             return $('~message');
         }
@@ -79,14 +80,14 @@ class LoginPage {
         await driver.hideKeyboard();
         await driver.pause(1000);
         await this.loginButton.scrollIntoView();
-        await waitUtil.waitForClickable(this.loginButton, 10000)
+        await this.loginButton.waitForDisplayed({ timeout: 10000 });
         await this.loginButton.click();
         await driver.pressKeyCode(66);
     }
 
 
     async verifyInboxOfAccount(username) {
-        await waitUtil.waitForDisplayed(this.inboxHeader, 20000)
+        await waitUtil.waitForDisplayed(this.inbox, 20000)
         await browser.waitUntil(
             async () => await this.accountLabel(username).isDisplayed(),
             {
