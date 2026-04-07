@@ -22,8 +22,8 @@ exports.config = {
     // of the config file unless it's absolute.
     //
     specs: [
-        './features/compose.feature'
-    ],
+    './features/api/**/*.feature'
+],
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
